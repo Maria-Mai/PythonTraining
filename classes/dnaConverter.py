@@ -1,3 +1,5 @@
+#todo
+
 import binascii
 import csv
 import random
@@ -46,7 +48,13 @@ class DnaConverter(object):
         s1 = self.__S4_S1(s4)
         bytes = self.__S1_Bytes(s1)
 
-        print(bytes)
+        # bmp todo in methode auslagern
+        if(path.endswith("bmp.dna")):
+            with open(path + ".reverse", "wb") as image: #todo ausgabe pfad .bmp am ende dmait öffnen
+                image.write(bytearray(bytes))
+        # text
+        else:
+            print(bytes) #TODO
 
     def decode_with_segments(self, path):
 
@@ -59,18 +67,38 @@ class DnaConverter(object):
         s1 = self.__S4_S1(s4)
         bytes = self.__S1_Bytes(s1)
 
-        print(bytes)
+        # bmp todo in methode auslagern
+        if ((".bmp" in path) or (".dib" in path)):
+            with open(path + ".reverse", "wb") as image:  # todo ausgabe pfad .bmp am ende dmait öffnen
+                image.write(bytearray(bytes))
+        # text
+        else:
+            print(bytes)  # TODO
+
 
     #### private methods encoding #####
 
-    """ file into byte string """
+    """ file into byte string """ #TODO
     def __S0_S1(self, path):
         s1 = ""
-        with open(path, 'rb') as file:
-            byte = file.read(1)
-            while byte:
-                s1 = s1 + self.huffmanDict[str(int(binascii.hexlify(byte), 16))]
+
+        #bmp
+        if (path.endswith(".bmp") == True):
+            with open(path, 'rb') as image:
+                f = image.read()
+                imageByteArray = bytearray(f)
+
+            for i in range(len(imageByteArray)):
+                s1 = s1 + self.huffmanDict[str(imageByteArray[i])]
+
+        #text
+        else:
+            with open(path, 'rb') as file:
                 byte = file.read(1)
+                while byte:
+                    s1 = s1 + self.huffmanDict[str(int(binascii.hexlify(byte), 16))]
+                    byte = file.read(1)
+
         return s1
 
     """ convert to base-3 using Huffman code """
@@ -116,14 +144,17 @@ class DnaConverter(object):
         numberOfSegments = int(n/self.dnaOffset)
 
         segments = []
-        for i in range(numberOfSegments-3):
-            segment = s5[i*25-i:i*25 + 100]
+        for i in range(numberOfSegments-3): #todo warum -3?
+            segment = s5[i*25:i*25 + 100]
+            print(len(segment))
+
             # not odd
             if((i % 2) == 0):
                 segments.append(segment)
             #odd - need of complement
             else:
                 segments.append(self.__reverse_complement(segment))
+
         return segments
 
     """  """
@@ -132,6 +163,7 @@ class DnaConverter(object):
         appended_segments = []
 
         for i in range(len(segments)):
+
             i3 = self.__decimal_base3(i)
             while(len(i3) < 12):
                 i3 = "0" + i3

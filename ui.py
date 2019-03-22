@@ -5,8 +5,14 @@ import sys, os
 
 def main_menu():
 
+    #todo test mit bild und text jeweils beide algos und dann auskommentieren
     convert = DnaConverter()
-    convert.decode_with_segments("/home/mai/PycharmProjects/pythonUNI/text.txt.dna.segments")
+    #convert.encode_with_segments("/home/mai/PycharmProjects/pythonUNI/icon.bmp")
+    convert.decode_with_segments("/home/mai/PycharmProjects/pythonUNI/icon.bmp.dna.segments")
+
+    #convert.encode_with_base_algo("/home/mai/PycharmProjects/pythonUNI/text.txt")
+
+
     """
     # after start
     print("Willkommen zu Ihrem ganz persoenlichen DNA-Konvertierungsprogramm. "
