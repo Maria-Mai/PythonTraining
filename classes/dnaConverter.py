@@ -144,7 +144,7 @@ class DnaConverter(object):
         numberOfSegments = int(n/self.dnaOffset)
 
         segments = []
-        for i in range(numberOfSegments-3): #todo warum -3?
+        for i in range(numberOfSegments-3):
             segment = s5[i*25:i*25 + 100]
             print(len(segment))
 

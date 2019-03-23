@@ -1,6 +1,7 @@
 #this programm TODO
 
 from classes.dnaConverter import DnaConverter
+from classes.LZWForDNA import LZWForDNA
 import sys, os
 
 def main_menu():
@@ -8,10 +9,12 @@ def main_menu():
     #todo test mit bild und text jeweils beide algos und dann auskommentieren
     convert = DnaConverter()
     #convert.encode_with_segments("/home/mai/PycharmProjects/pythonUNI/icon.bmp")
-    convert.decode_with_segments("/home/mai/PycharmProjects/pythonUNI/icon.bmp.dna.segments")
-
+    #convert.decode_with_segments("/home/mai/PycharmProjects/pythonUNI/icon.bmp.dna.segments")
     #convert.encode_with_base_algo("/home/mai/PycharmProjects/pythonUNI/text.txt")
 
+    compressor = LZWForDNA()
+    compressor.encode("/home/mai/PycharmProjects/pythonUNI/text.txt.dna")
+    compressor.decode("/home/mai/PycharmProjects/pythonUNI/text.txt.dna.compress")
 
     """
     # after start
