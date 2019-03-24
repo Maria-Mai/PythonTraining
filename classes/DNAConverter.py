@@ -1,4 +1,6 @@
-#todo
+# this class implements an algorithm
+# to convert ASCII-text or Bitmap-pictures
+# into a DNA-string and back to normal.
 
 import binascii
 import csv
@@ -12,8 +14,12 @@ class DnaConverter(object):
     dnaComplementDict = {"A" : "T", "T" : "A", "C" : "G", "G" : "C"}
     dnaOffset = 25
 
+    """ init the converter """
     def __init__(self):
+        #read in the huffman code
         huffmannTextFile = open("huffmanCode.dict", "r")
+        #parse huffmann code to two dictiionaries for both directions
+        # base3 to decimal and decimal to base3
         csv_reader = csv.reader(huffmannTextFile, delimiter=",")
         for row in csv_reader:
             self.huffmanDict[row[0]] = row[1]
@@ -27,6 +33,7 @@ class DnaConverter(object):
         s4 = self.__S3_S4(s1, s2, s3)
         s5 = self.__S4_S5(s4, "A")
         open(path + ".dna", "w").write(s5)
+        return path + ".dna"
 
     """ encoding with overlaping segemnts """
     def encode_with_segments(self, path):
@@ -37,57 +44,68 @@ class DnaConverter(object):
         s5 = self.__S4_S5(s4, "A")
 
         segments = self.__split_S5(s5)
-        finished_segments = self.__segment_i(segments, "12") #TODO get ID
-        self.__save_segments_to_files(finished_segments, path)
+        # nur ein document, also nur eine ID notwendig - 12 ist eine id im base3 format
+        finished_segments = self.__segment_i(segments, "12")
+        output_path = self.__save_segments_to_files(finished_segments, path)
 
-        return finished_segments
+        return output_path
 
+    """ decoding without overlapping segments """
     def decode_with_base_algo(self, path):
         s5 = self.__getS5(path)
         s4 = self.__S5_S4(s5, "A")
         s1 = self.__S4_S1(s4)
         bytes = self.__S1_Bytes(s1)
 
-        # bmp todo in methode auslagern
-        if(path.endswith("bmp.dna")):
-            with open(path + ".reverse", "wb") as image: #todo ausgabe pfad .bmp am ende dmait öffnen
+        output_path = ""
+        # for bitmaps
+        if((".bmp" in path) or (".dib" in path)):
+            output_path = path + ".reverse.bmp"
+            with open(output_path, "wb") as image:
                 image.write(bytearray(bytes))
-        # text
+        # for text
         else:
-            print(bytes) #TODO
+            output_path = path + "reverse.txt"
+            with open(output_path, "wb") as file:
+                file.write(bytes)
 
+        return output_path
+
+    """ decoding with overlapping segments """
     def decode_with_segments(self, path):
-
         finishedSegments = self.__getFinishedSegments(path)
         segments = self.__getSegments(finishedSegments)
-
         s5 = self.__segments_S5(segments)
-
         s4 = self.__S5_S4(s5, "A")
         s1 = self.__S4_S1(s4)
         bytes = self.__S1_Bytes(s1)
 
-        # bmp todo in methode auslagern
-        if ((".bmp" in path) or (".dib" in path)):
-            with open(path + ".reverse", "wb") as image:  # todo ausgabe pfad .bmp am ende dmait öffnen
+        output_path = ""
+        # for bitmaps
+        if((".bmp" in path) or (".dib" in path)):
+            output_path = path + ".reverse.bmp"
+            with open(output_path, "wb") as image:
                 image.write(bytearray(bytes))
-        # text
+        # for text
         else:
-            print(bytes)  # TODO
+            output_path = path + "reverse.txt"
+            with open(output_path, "wb") as file:
+                file.write(bytes)
 
+        return output_path
 
     #### private methods encoding #####
 
-    """ file into byte string """ #TODO
+    """ file into byte string """
     def __S0_S1(self, path):
         s1 = ""
 
-        #bmp
+        # for bmp
         if (path.endswith(".bmp") == True):
             with open(path, 'rb') as image:
                 f = image.read()
                 imageByteArray = bytearray(f)
-
+            #transform into base3 using huffman code
             for i in range(len(imageByteArray)):
                 s1 = s1 + self.huffmanDict[str(imageByteArray[i])]
 
@@ -95,21 +113,28 @@ class DnaConverter(object):
         else:
             with open(path, 'rb') as file:
                 byte = file.read(1)
+                # transform into base3 using huffman code
                 while byte:
                     s1 = s1 + self.huffmanDict[str(int(binascii.hexlify(byte), 16))]
                     byte = file.read(1)
 
         return s1
 
-    """ convert to base-3 using Huffman code """
+    """ repesent length of string in base3 """
     def __S1_S2(self, s1):
+        #get length
         n = len(s1)
+        #make decimal length to base3 length
         n_base3 = self.__decimal_base3(n)
+        #get the length of the base3 length
         n_base3_length = len(n_base3)
 
+        #s2 needs a length of 20
         s2 = ""
+        #get number of zeros to get to len 20
         for i in range(20 - n_base3_length):
             s2 = s2 + "0"
+        # add length in base3 to zeros
         return (s2 + n_base3)
 
     """ make length multiple of 25 """
@@ -124,6 +149,7 @@ class DnaConverter(object):
 
     """ set strings together """
     def __S3_S4(self, s1, s2, s3):
+        #concat all strings
         s4 = s1 + s3 + s2
         return s4
 
@@ -137,6 +163,8 @@ class DnaConverter(object):
             s5 = s5 + self.dnaDict[s5[i - 1]][int(s4[i])]
         return s5
 
+    ### for the segments go on ###
+
     """ split into blocks of 100 nt with offset 25 (rest is overlapping) 
     build the reverse complement if i is odd"""
     def __split_S5(self, s5):
@@ -145,8 +173,8 @@ class DnaConverter(object):
 
         segments = []
         for i in range(numberOfSegments-3):
+            # overlapping with offset 25
             segment = s5[i*25:i*25 + 100]
-            print(len(segment))
 
             # not odd
             if((i % 2) == 0):
@@ -154,10 +182,9 @@ class DnaConverter(object):
             #odd - need of complement
             else:
                 segments.append(self.__reverse_complement(segment))
-
         return segments
 
-    """  """
+    """ add a parity bit and append nt for the direction of a segment """
     def __segment_i(self, segments, id):
 
         appended_segments = []
@@ -213,6 +240,7 @@ class DnaConverter(object):
         with open(path + ".dna.segments", "w") as file:
             for segment in finished_segments:
                 file.write(segment + "\n")
+        return path + ".dna.segments"
 
     ### private methods for decoding
 
@@ -222,6 +250,7 @@ class DnaConverter(object):
         with open(path, 'r') as file:
             for line in file:
                 line = line.rstrip('\n')
+                #every line is an entry in the array
                 finishedSegments.append(line)
 
         return finishedSegments
@@ -238,7 +267,6 @@ class DnaConverter(object):
             id = ix[0:2]
             i = ix[2:14]
 
-            idBase3 = self.__S5_S4(id, segment[-1])
             iBase3 = self.__S5_S4(i, id[-1])
 
             iDecimal = self.__base3_decimal(iBase3)
@@ -251,7 +279,7 @@ class DnaConverter(object):
         s5 = ""
 
         for j in range(len(segments)):
-            segment = segments[j]
+            segment = segments[j] #todo test wirft fehler
 
             #odd
             if(j % 2 == 1):
@@ -316,7 +344,7 @@ class DnaConverter(object):
         #reverse string
         reverseSegment = segment[::-1]
         #build the complement
-        for i in range(len(reverseSegment)): #todo check hinweg
+        for i in range(len(reverseSegment)):
             reverseComplementSegment = reverseComplementSegment + self.dnaComplementDict[reverseSegment[i]]
         return reverseComplementSegment
 
