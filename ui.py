@@ -113,7 +113,7 @@ def reverse():
     #base algo
     else:
         try:
-            output_path = converter.decode_with_base_algo()
+            output_path = converter.decode_with_base_algo(path)
             print("Fertig. Sie finden die Datei in ihrem aktuellen Verzeichnis.")
             print(output_path)
             main_menu()

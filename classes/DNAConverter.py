@@ -65,7 +65,7 @@ class DnaConverter(object):
                 image.write(bytearray(bytes))
         # for text
         else:
-            output_path = path + "reverse.txt"
+            output_path = path + ".reverse.txt"
             with open(output_path, "wb") as file:
                 file.write(bytes)
 
@@ -88,7 +88,7 @@ class DnaConverter(object):
                 image.write(bytearray(bytes))
         # for text
         else:
-            output_path = path + "reverse.txt"
+            output_path = path + ".reverse.txt"
             with open(output_path, "wb") as file:
                 file.write(bytes)
 
@@ -260,7 +260,7 @@ class DnaConverter(object):
         segments = {}
 
         for j in range(len(finishedSegments)):
-            segment =  finishedSegments[j][1:101]
+            segment = finishedSegments[j][1:101]
             # you could use the parity bit to check whether the data is broken
             ix = (finishedSegments[j][101:116])
 
@@ -279,7 +279,7 @@ class DnaConverter(object):
         s5 = ""
 
         for j in range(len(segments)):
-            segment = segments[j] #todo test wirft fehler
+            segment = segments[j]
 
             #odd
             if(j % 2 == 1):

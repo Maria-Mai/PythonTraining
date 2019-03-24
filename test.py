@@ -1,5 +1,6 @@
 #this class is a test for the algorithms
-#todo mehr comments und mal testen
+#algo convert to dna-string
+#and lempel ziv compression
 
 from classes.DNAConverter import DnaConverter
 from classes.LZWForDNA import LZWForDNA
@@ -21,7 +22,7 @@ converter.decode_with_segments("/home/mai/PycharmProjects/pythonUNI/text.txt.dna
 converter.encode_with_base_algo("/home/mai/PycharmProjects/pythonUNI/icon.bmp")
 compressor.encode("/home/mai/PycharmProjects/pythonUNI/icon.bmp.dna")
 compressor.decode("/home/mai/PycharmProjects/pythonUNI/icon.bmp.dna.compress")
-converter.decode_with_segments("/home/mai/PycharmProjects/pythonUNI/icon.bmp.dna.decompress")
+converter.decode_with_base_algo("/home/mai/PycharmProjects/pythonUNI/icon.bmp.dna.decompress")
 
 #bitmap with segments (and back)
 converter.encode_with_segments("/home/mai/PycharmProjects/pythonUNI/icon.bmp")
